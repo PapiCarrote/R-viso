@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2255%22 font-size=%2280%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>%F0%9F%93%9A</text></svg>">
-<title>RévisO — v2.0</title>
+<title>RévisO — v2.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
@@ -375,6 +375,14 @@ body.sidebar-collapsed #sidebarToggle{transform:rotate(180deg);}
 .auth-link:hover{color:var(--accent);}
 .cloud-status{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:600;}
 .cloud-status.show{opacity:1;}
+.admin-modal{max-width:520px;}
+.adm-label{display:block;font-size:12px;font-weight:700;color:var(--text-sec);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px;}
+.adm-tools{margin-top:8px;}
+.adm-pending{max-height:160px;overflow:auto;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;background:var(--bg-2);}
+.adm-row{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:7px;}
+.adm-row:hover{background:var(--bg-hover);}
+.adm-mail{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.adm-info{font-size:11px;color:var(--text-muted);}
 .color-note{font-size:12.5px;color:var(--text-sec);line-height:1.6;margin-bottom:16px;background:var(--bg-2);padding:10px 12px;border-radius:var(--radius-sm);}
 .color-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
 .color-row:last-of-type{border-bottom:none;}
@@ -475,6 +483,29 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 </head>
 <body>
 
+<!-- MODAL ADMIN -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal admin-modal">
+    <h2>🛠️ Espace administrateur</h2>
+    <p class="color-note">Pré-configure le profil d'un utilisateur : son JSON sera chargé automatiquement à sa première connexion avec cet e-mail.</p>
+    <label class="adm-label">E-mail de l'utilisateur</label>
+    <input type="email" id="admEmail" class="quiz-input" placeholder="prenom.nom@exemple.com">
+    <label class="adm-label">JSON à assigner</label>
+    <textarea id="admJson" class="quiz-input" style="min-height:120px;font-family:monospace;font-size:12px" placeholder='Colle ici le JSON (export ou généré), ou importe un fichier ci-dessous'></textarea>
+    <div class="adm-tools">
+      <input type="file" id="admFile" accept=".json" style="display:none" onchange="admImportFile(event)">
+      <button class="btn-sm" onclick="document.getElementById('admFile').click()">📁 Importer un .json</button>
+    </div>
+    <div class="auth-msg" id="admMsg"></div>
+    <label class="adm-label">Assignations en attente</label>
+    <div class="adm-pending" id="admPending"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAdminModal()">Fermer</button>
+      <button class="btn btn-accent" onclick="adminAssign()">Assigner</button>
+    </div>
+  </div>
+</div>
+
 <!-- ÉCRAN DE CONNEXION -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-box">
@@ -497,13 +528,14 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 
 <header class="app-header">
   <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Réduire / afficher la liste des matières">⟨</button>
-  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.0</span></div>
+  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.1</span></div>
   <div class="header-spacer"></div>
   <button class="header-btn" onclick="importData()" title="Importer une sauvegarde">📥 Importer</button>
   <button class="header-btn" onclick="exportData()" title="Exporter la sauvegarde">📤 Exporter</button>
   <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
   <button class="header-btn" onclick="openColorModal()" id="colorBtn" title="Personnaliser les couleurs">🎨</button>
   <button class="header-btn" onclick="toggleTheme()" id="themeBtn" title="Basculer jour / nuit">🌙 Nuit</button>
+  <button class="header-btn" onclick="openAdminModal()" id="adminBtn" title="Espace administrateur" style="display:none">🛠️ Admin</button>
   <button class="header-btn" onclick="authLogout()" id="accountBtn" title="Mon compte" style="display:none">👤 Déconnexion</button>
 </header>
 
@@ -1854,12 +1886,29 @@ function syncCloud(){
     }catch(e){console.warn('Sync cloud:',e);}
   },800);
 }
+function applyDataObject(d){
+  matieres=d.matieres||[];nextId=d.nextId||(matieres.reduce((a,m)=>Math.max(a,m.id||0),0)+1);
+  objectifs=d.objectifs||[];
+  if(d.stats){stats=d.stats;if(!stats.days)stats.days={};if(!stats.matieres)stats.matieres={};}
+  try{localStorage.setItem('reviso_data',JSON.stringify({matieres,nextId}));localStorage.setItem('reviso_obj',JSON.stringify(objectifs));localStorage.setItem('reviso_stats',JSON.stringify(stats));}catch(e){}
+}
 async function cloudLoad(){
   try{
     const {data,error}=await sb.from('reviso_saves').select('data').eq('user_id',currentUser.id).maybeSingle();
     if(error)console.warn('Chargement cloud:',error);
-    if(data&&data.data){const d=data.data;matieres=d.matieres||[];nextId=d.nextId||1;objectifs=d.objectifs||[];if(d.stats){stats=d.stats;if(!stats.days)stats.days={};if(!stats.matieres)stats.matieres={};}
-      try{localStorage.setItem('reviso_data',JSON.stringify({matieres,nextId}));localStorage.setItem('reviso_obj',JSON.stringify(objectifs));localStorage.setItem('reviso_stats',JSON.stringify(stats));}catch(e){}}
+    if(data&&data.data&&(data.data.matieres||[]).length){
+      applyDataObject(data.data);
+    }else{
+      // Pas encore de données : on regarde si un JSON a été pré-assigné à cet e-mail
+      try{
+        const {data:pend}=await sb.from('pending_saves').select('data').eq('email',(currentUser.email||'').toLowerCase()).maybeSingle();
+        if(pend&&pend.data){
+          applyDataObject(pend.data);save();saveObj();saveStats();
+          await sb.from('pending_saves').delete().eq('email',(currentUser.email||'').toLowerCase());
+          flash('Tes révisions pré-configurées ont été chargées !');
+        }
+      }catch(e){console.warn('Pending:',e);}
+    }
   }catch(e){console.warn(e);}
   renderList();goHome();
 }
@@ -1893,8 +1942,53 @@ function onLoggedIn(){
   showAuth(false);
   const ab=document.getElementById('accountBtn');ab.style.display='inline-flex';
   ab.title='Connecté : '+(currentUser.email||'');
+  checkAdmin();
   cloudLoad();
 }
+
+// ── Page administrateur : pré-assigner un JSON à un e-mail ──
+let isAdmin=false,adminPendingData=null;
+async function checkAdmin(){
+  isAdmin=false;
+  try{
+    const {data}=await sb.from('admins').select('email').eq('email',(currentUser.email||'').toLowerCase()).maybeSingle();
+    isAdmin=!!data;
+  }catch(e){isAdmin=false;}
+  document.getElementById('adminBtn').style.display=isAdmin?'inline-flex':'none';
+}
+function openAdminModal(){if(!isAdmin)return;adminPendingData=null;document.getElementById('admJson').value='';adminMsg('');document.getElementById('admEmail').value='';document.getElementById('adminModal').classList.add('show');loadPendingList();}
+function closeAdminModal(){document.getElementById('adminModal').classList.remove('show');}
+function adminMsg(t,err){const m=document.getElementById('admMsg');m.textContent=t||'';m.className='auth-msg '+(err?'err':'ok');}
+function admImportFile(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('admJson').value=r.result;adminMsg('Fichier chargé, vérifie puis assigne.');};r.readAsText(f);e.target.value='';}
+async function adminAssign(){
+  const email=(document.getElementById('admEmail').value||'').trim().toLowerCase();
+  const raw=document.getElementById('admJson').value.trim();
+  if(!email||!email.includes('@')){adminMsg('Entre un e-mail valide.',true);return;}
+  if(!raw){adminMsg('Colle un JSON (ou importe un fichier).',true);return;}
+  let d;try{d=JSON.parse(raw);}catch(_){adminMsg('JSON invalide.',true);return;}
+  if(!d.matieres){adminMsg('Ce JSON ne contient pas de « matieres ».',true);return;}
+  adminMsg('Enregistrement...');
+  const {error}=await sb.from('pending_saves').upsert({email,data:d,created_at:new Date().toISOString()});
+  if(error){adminMsg('Erreur : '+error.message,true);return;}
+  adminMsg('✓ JSON assigné à '+email+'. Il le recevra à sa première connexion.');
+  document.getElementById('admJson').value='';document.getElementById('admEmail').value='';
+  loadPendingList();
+}
+async function loadPendingList(){
+  const box=document.getElementById('admPending');box.innerHTML='<div class="empty-mini">Chargement...</div>';
+  try{
+    const {data,error}=await sb.from('pending_saves').select('email,created_at,data').order('created_at',{ascending:false});
+    if(error){box.innerHTML='<div class="empty-mini">Erreur : '+error.message+'</div>';return;}
+    if(!data||!data.length){box.innerHTML='<div class="empty-mini">Aucune assignation en attente.</div>';return;}
+    box.innerHTML=data.map(p=>{const n=(p.data&&p.data.matieres&&p.data.matieres.length)||0;
+      return `<div class="adm-row"><span class="adm-mail">${esc(p.email)}</span><span class="adm-info">${n} matière(s)</span><span class="del-x" onclick="adminDeletePending('${esc(p.email)}')">×</span></div>`;}).join('');
+  }catch(e){box.innerHTML='<div class="empty-mini">Erreur de chargement.</div>';}
+}
+async function adminDeletePending(email){
+  if(!confirm('Retirer l\u2019assignation pour '+email+' ?'))return;
+  await sb.from('pending_saves').delete().eq('email',email);loadPendingList();
+}
+
 function continueLocal(){showAuth(false);} // utiliser sans compte (local seulement)
 function traduitErreur(m){m=(m||'').toLowerCase();
   if(m.includes('invalid login'))return 'E-mail ou mot de passe incorrect.';
