@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RévisO">
-<title>RévisO — v2.2</title>
+<title>RévisO — v2.6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
@@ -214,8 +214,22 @@ body.sidebar-collapsed #sidebarToggle{transform:rotate(180deg);}
 .canvas-stage{position:relative;width:100%;height:440px;background:var(--bg-input);border:1px solid var(--border);overflow:hidden;touch-action:none;}
 .cv-el{position:absolute;box-sizing:border-box;cursor:move;user-select:none;}
 .cv-text{display:flex;align-items:flex-start;padding:4px 6px;}
+.cv-shape{position:absolute;inset:0;}
+.cv-shape-wrap{background:transparent;}
 .cv-rect{border-radius:8px;}
 .cv-ellipse{border-radius:50%;}
+.cv-triangle{clip-path:polygon(50% 0,100% 100%,0 100%);}
+.cv-diamond{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
+.cv-star{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);}
+.cv-blob{border-radius:47% 53% 70% 30% / 45% 45% 55% 55%;}
+.cv-line{border-radius:6px;}
+.cv-menu{position:fixed;z-index:1000;background:var(--bg-1);border:1px solid var(--border);border-radius:11px;box-shadow:0 12px 34px rgba(0,0,0,.28);padding:5px;min-width:185px;display:none;}
+.cv-menu.show{display:block;}
+.cv-menu button{display:flex;width:100%;gap:9px;align-items:center;background:none;border:none;color:var(--text);font-size:13px;padding:8px 11px;border-radius:7px;cursor:pointer;text-align:left;font-family:inherit;font-weight:500;}
+.cv-menu button:hover{background:var(--bg-hover);}
+.cv-menu .cv-menu-del{color:var(--danger);}
+.cv-menu hr{border:none;border-top:1px solid var(--border);margin:4px 4px;}
+.cv-menu kbd{margin-left:auto;font-size:10px;color:var(--text-muted);background:var(--bg-2);padding:1px 5px;border-radius:4px;}
 .cv-el.sel{outline:2px solid var(--accent);outline-offset:2px;}
 .cv-text-edit{width:100%;height:100%;outline:none;white-space:pre-wrap;overflow:hidden;word-break:break-word;font-family:'Nunito Sans',sans-serif;line-height:1.3;}
 .cv-handle{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;background:var(--accent);border:2px solid #fff;border-radius:50%;cursor:nwse-resize;display:none;box-shadow:0 1px 3px rgba(0,0,0,.3);}
@@ -224,6 +238,7 @@ body.sidebar-collapsed #sidebarToggle{transform:rotate(180deg);}
 .cv-controls.show{display:flex;}
 .cv-controls label{font-size:12px;color:var(--text-sec);display:flex;align-items:center;gap:6px;}
 .cv-controls input[type=color]{width:34px;height:26px;padding:1px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);cursor:pointer;}
+.cv-opactl input[type=range]{width:90px;cursor:pointer;accent-color:var(--accent);}
 .cv-mini{padding:5px 9px;border:1px solid var(--border);background:var(--bg-1);color:var(--text-sec);border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;}
 .cv-mini:hover{border-color:var(--accent);color:var(--accent);}
 .cv-mini.cv-del:hover{border-color:var(--danger);color:var(--danger);}
@@ -381,6 +396,8 @@ body.sidebar-collapsed #sidebarToggle{transform:rotate(180deg);}
 .auth-link:hover{color:var(--accent);}
 .cloud-status{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:600;}
 .cloud-status.show{opacity:1;}
+.fiche-item{cursor:pointer;}
+.fiches-hint{font-size:12.5px;color:var(--text-sec);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:12px;line-height:1.5;}
 .admin-modal{max-width:520px;}
 .adm-label{display:block;font-size:12px;font-weight:700;color:var(--text-sec);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px;}
 .adm-tools{margin-top:8px;}
@@ -489,6 +506,18 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 </head>
 <body>
 
+<!-- MENU CLIC DROIT (objets canvas) -->
+<div class="cv-menu" id="cvMenu">
+  <button onclick="cvCopy();cvMenuClose()">📋 Copier <kbd>Ctrl+C</kbd></button>
+  <button onclick="cvPaste();cvMenuClose()">📥 Coller <kbd>Ctrl+V</kbd></button>
+  <button onclick="cvDuplicate();cvMenuClose()">⧉ Dupliquer <kbd>Ctrl+D</kbd></button>
+  <hr>
+  <button onclick="cvLayer(cvSel.type,cvSel.id);cvMenuClose()">↑ Mettre au premier plan</button>
+  <button onclick="cvLayerBack();cvMenuClose()">↓ Mettre à l'arrière-plan</button>
+  <hr>
+  <button class="cv-menu-del" onclick="cvDelete(cvSel.type,cvSel.id);cvMenuClose()">🗑 Supprimer <kbd>Suppr</kbd></button>
+</div>
+
 <!-- MODAL ADMIN -->
 <div class="modal-overlay" id="adminModal">
   <div class="modal admin-modal">
@@ -534,7 +563,7 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 
 <header class="app-header">
   <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Réduire / afficher la liste des matières">⟨</button>
-  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.2</span></div>
+  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.6</span></div>
   <div class="header-spacer"></div>
   <button class="header-btn" onclick="importData()" title="Importer une sauvegarde">📥 Importer</button>
   <button class="header-btn" onclick="exportData()" title="Exporter la sauvegarde">📤 Exporter</button>
@@ -1114,17 +1143,20 @@ function quizPlayer(m){
 // ── Onglet Fiches
 function tabFiches(m){
   const f=m.fiches||[];
-  const items=f.length?f.map(x=>`
-    <div class="row-item">
-      <div class="row-main"><div class="row-name">${esc(x.nom)}</div>
-        <div class="row-sub"><a class="mini-link" href="${esc(x.url)}" target="_blank">🎨 Ouvrir dans Canva</a></div></div>
-      <div class="row-actions"><span class="del-x" onclick="delFiche('${x.id}')">×</span></div>
-    </div>`).join(''):'<div class="empty-mini">Aucune fiche. Ajoute un lien Canva.</div>';
-  return items+`
+  const items=f.length?f.map(x=>{
+    const n=(x.canvas&&x.canvas.elements&&x.canvas.elements.length)||0;
+    const ext=x.url?` · <a class="mini-link" href="${esc(x.url)}" target="_blank" onclick="event.stopPropagation()">🎨 Lien externe</a>`:'';
+    return `<div class="row-item fiche-item" onclick="openChapLarge('fiche','${x.id}')">
+      <div class="row-main"><div class="row-name">📝 ${esc(x.nom)}</div>
+        <div class="row-sub">${n} élément(s)${ext}</div></div>
+      <div class="row-actions" onclick="event.stopPropagation()">
+        <span class="row-expand" onclick="openChapLarge('fiche','${x.id}')" title="Ouvrir la fiche">⛶</span>
+        <span class="del-x" onclick="delFiche('${x.id}')">×</span>
+      </div></div>`;}).join(''):'<div class="empty-mini">Aucune fiche pour l\'instant. Crée ta première fiche de révision visuelle !</div>';
+  return `<div class="fiches-hint">Crée des fiches de révision visuelles : ajoute des zones de texte, des formes et des couleurs, comme sur Canva.</div>`+items+`
     <div class="add-inline">
-      <input class="grow" id="newFicheNom" placeholder="Nom de la fiche">
-      <input class="grow" id="newFicheUrl" placeholder="Lien Canva">
-      <button class="btn-sm" onclick="addFiche()">+ Ajouter</button>
+      <input class="grow" id="newFicheNom" placeholder="Nom de la nouvelle fiche (ex. Résumé chapitre 1)">
+      <button class="btn-sm" onclick="addFiche()">+ Nouvelle fiche</button>
     </div>`;
 }
 
@@ -1341,7 +1373,7 @@ function setNoteFont(type,id,key){
 }
 
 // ════════════════ BLOC-NOTES : Texte OU Tableau (éditeur visuel) ════════════════
-function noteItem(type,id){const m=getMatiere(currentId);const arr=type==='chap'?m.chapitres:m.exercices;return arr.find(x=>x.id===id);}
+function noteItem(type,id){const m=getMatiere(currentId);const arr=type==='chap'?m.chapitres:(type==='fiche'?m.fiches:m.exercices);return (arr||[]).find(x=>x.id===id);}
 function noteBlock(type,id,item){
   const mode=item.noteMode==='canvas'?'canvas':'text';
   const ph=type==='chap'?'Écris ton cours, tes notes, le résumé du chapitre...':"Écris l'énoncé, ta solution, la correction, tes remarques...";
@@ -1353,24 +1385,26 @@ function noteBlock(type,id,item){
 }
 function setNoteMode(type,id,mode){const it=noteItem(type,id);it.noteMode=mode;if(mode==='canvas'&&!it.canvas)it.canvas={elements:[]};save();refreshNoteHost(type,id);}
 
-// ── Afficher un chapitre en grand (modal plein écran)
+// ── Afficher un chapitre / une fiche en grand (modal plein écran)
 let largeChap=null;
+function hostContent(type,id){const it=noteItem(type,id);return type==='fiche'?noteCanvas('fiche',id,it.canvas):noteBlock(type,id,it);}
 function openChapLarge(type,id){
   const it=noteItem(type,id);it.open=false; // replie la copie de l'accordéon (évite les ID en double)
+  if(type==='fiche'&&!it.canvas)it.canvas={elements:[]};
   largeChap={type,id};renderContent();
-  document.getElementById('chapModalTitle').textContent=it.nom;
-  document.getElementById('chapModalBody').innerHTML=noteBlock(type,id,it);
+  document.getElementById('chapModalTitle').textContent=(type==='fiche'?'📝 ':'')+it.nom;
+  document.getElementById('chapModalBody').innerHTML=hostContent(type,id);
   document.getElementById('chapModal').classList.add('show');
 }
 function closeChapLarge(){
   document.getElementById('chapModal').classList.remove('show');
   document.getElementById('chapModalBody').innerHTML='';
-  largeChap=null;
+  largeChap=null;renderContent();
 }
 // Met à jour le bon conteneur : le modal si ouvert sur cet élément, sinon le contenu normal
 function refreshNoteHost(type,id){
   if(largeChap&&largeChap.type===type&&largeChap.id===id){
-    document.getElementById('chapModalBody').innerHTML=noteBlock(type,id,noteItem(type,id));
+    document.getElementById('chapModalBody').innerHTML=hostContent(type,id);
   }else{renderContent();}
 }
 
@@ -1382,9 +1416,14 @@ function noteCanvas(type,id,canvas){
   <div class="canvas-wrap">
     <div class="canvas-toolbar">
       <button class="cv-add" onclick="addCanvasEl('${type}','${id}','text')">+ Texte</button>
-      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','rect')">+ Rectangle</button>
-      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','ellipse')">+ Cercle</button>
-      <span class="cv-hint">Clique un élément pour le modifier · glisse pour déplacer · coin pour redimensionner · double-clic sur un texte pour l'écrire</span>
+      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','rect')">▭ Rectangle</button>
+      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','ellipse')">⬭ Cercle</button>
+      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','triangle')">▲ Triangle</button>
+      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','diamond')">◆ Losange</button>
+      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','star')">★ Étoile</button>
+      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','blob')">🌸 Tache</button>
+      <button class="cv-add" onclick="addCanvasEl('${type}','${id}','line')">— Trait</button>
+      <span class="cv-hint">Clique un élément pour le modifier · glisse pour déplacer · Ctrl+C / Ctrl+V pour copier-coller · double-clic sur un texte</span>
     </div>
     <div class="canvas-stage" id="stage_${type}_${id}" onpointerdown="canvasStageClick(event,'${type}','${id}')">
       ${els.map(o=>cvElHTML(type,id,o)).join('')}
@@ -1393,6 +1432,7 @@ function noteCanvas(type,id,canvas){
       <label>Remplissage <input type="color" id="cvfill_${type}_${id}" oninput="cvSet('${type}','${id}','fill',this.value)"></label>
       <label id="cvtextlbl_${type}_${id}">Couleur texte <input type="color" id="cvtext_${type}_${id}" oninput="cvSet('${type}','${id}','color',this.value)"></label>
       <label class="cv-sizectl">Taille <button class="cv-mini" onclick="cvFont('${type}','${id}',-2)">A−</button><button class="cv-mini" onclick="cvFont('${type}','${id}',2)">A+</button></label>
+      <label class="cv-opactl">Transparence <input type="range" min="10" max="100" value="100" id="cvopa_${type}_${id}" oninput="cvOpacity('${type}','${id}',this.value)"></label>
       <button class="cv-mini" onclick="cvLayer('${type}','${id}')" title="Mettre au premier plan">↑ Avant</button>
       <button class="cv-mini cv-del" onclick="cvDelete('${type}','${id}')">🗑 Supprimer</button>
     </div>
@@ -1400,25 +1440,30 @@ function noteCanvas(type,id,canvas){
 }
 function cvElHTML(type,id,o){
   const pos=`left:${o.x}px;top:${o.y}px;width:${o.w}px;height:${o.h}px;`;
+  const op=(o.opacity==null?1:o.opacity);
+  const cm=`oncontextmenu="cvMenuOpen(event,'${type}','${id}','${o.id}')"`;
   const h=`<span class="cv-handle" onpointerdown="canvasDragStart(event,'${type}','${id}','${o.id}','resize')"></span>`;
   const dn=`onpointerdown="canvasDragStart(event,'${type}','${id}','${o.id}','move')"`;
   if(o.type==='text'){
-    return `<div class="cv-el cv-text" id="cv_${o.id}" style="${pos}background:${o.fill||'transparent'};" ${dn} ondblclick="cvEditStart('${o.id}')">
+    return `<div class="cv-el cv-text" id="cv_${o.id}" style="${pos}background:${o.fill||'transparent'};opacity:${op};" ${dn} ${cm} ondblclick="cvEditStart('${o.id}')">
       <div class="cv-text-edit" id="cvtxt_${o.id}" contenteditable="false" style="color:${o.color||'#333'};font-size:${o.fontSize||16}px;" oninput="cvText('${type}','${id}','${o.id}',this)">${esc(o.text||'')}</div>${h}</div>`;
   }
-  return `<div class="cv-el cv-${o.type}" id="cv_${o.id}" style="${pos}background:${o.fill||'#cdbff2'};" ${dn}>${h}</div>`;
+  return `<div class="cv-el cv-shape-wrap" id="cv_${o.id}" style="${pos}opacity:${op};" ${dn} ${cm}>
+    <div class="cv-shape cv-${o.type}" id="cvsh_${o.id}" style="background:${o.fill||'#cdbff2'};"></div>${h}</div>`;
 }
 function addCanvasEl(type,id,kind){
-  const it=canvasItem(type,id);
+  const it=canvasItem(type,id);cvSnapshot(type,id);
   const n=it.canvas.elements.length;const off=(n%7)*24;
-  const o={id:uid(),type:kind,x:30+off,y:30+off,w:kind==='text'?180:130,h:kind==='text'?56:90};
+  const SH={rect:[130,90,'#cdbff2'],ellipse:[120,120,'#ffc1e3'],triangle:[120,110,'#b8e0d2'],diamond:[120,120,'#f7d9a0'],star:[120,120,'#ffe08a'],blob:[130,120,'#d8b4f0'],line:[200,10,'#8b6ef0']};
+  const s=SH[kind]||[130,90,'#cdbff2'];
+  const o={id:uid(),type:kind,x:30+off,y:30+off,w:kind==='text'?180:s[0],h:kind==='text'?56:s[1],opacity:1};
   if(kind==='text'){o.text='Double-clic pour écrire';o.color=toHex(getComputedStyle(document.documentElement).getPropertyValue('--text'))||'#333333';o.fill='transparent';o.fontSize=16;}
-  else{o.fill=kind==='ellipse'?'#ffc1e3':'#cdbff2';}
+  else{o.fill=s[2];}
   it.canvas.elements.push(o);save();refreshNoteHost(type,id);selectCanvasEl(type,id,o.id);
 }
-let cvSel=null,cvDrag=null,cvEditing=null;
+let cvSel=null,cvDrag=null,cvEditing=null,cvClipboard=null,cvActiveHost=null;
 function selectCanvasEl(type,id,elId){
-  cvSel={type,id,elId};
+  cvSel={type,id,elId};cvActiveHost={type,id};
   document.querySelectorAll('.cv-el.sel').forEach(e=>e.classList.remove('sel'));
   const el=document.getElementById('cv_'+elId);if(el)el.classList.add('sel');
   const it=canvasItem(type,id);const o=it.canvas.elements.find(x=>x.id===elId);if(!o)return;
@@ -1427,17 +1472,69 @@ function selectCanvasEl(type,id,elId){
   const tc=document.getElementById('cvtext_'+type+'_'+id);if(tc)tc.value=toHex(o.color||'#333333');
   const tlbl=document.getElementById('cvtextlbl_'+type+'_'+id);if(tlbl)tlbl.style.display=(o.type==='text')?'flex':'none';
   const slbl=document.querySelector('#cvctrl_'+type+'_'+id+' .cv-sizectl');if(slbl)slbl.style.display=(o.type==='text')?'flex':'none';
+  const opa=document.getElementById('cvopa_'+type+'_'+id);if(opa)opa.value=Math.round((o.opacity==null?1:o.opacity)*100);
 }
 function canvasStageClick(e,type,id){
+  cvActiveHost={type,id};
   if(e.target.classList.contains('canvas-stage')){cvSel=null;
     document.querySelectorAll('.cv-el.sel').forEach(x=>x.classList.remove('sel'));
     const c=document.getElementById('cvctrl_'+type+'_'+id);if(c)c.classList.remove('show');}
 }
+function cvCopy(){
+  if(!cvSel)return false;
+  const it=canvasItem(cvSel.type,cvSel.id);const o=it.canvas.elements.find(x=>x.id===cvSel.elId);
+  if(!o)return false;
+  cvClipboard={host:{type:cvSel.type,id:cvSel.id},el:JSON.parse(JSON.stringify(o))};
+  flash('Élément copié');return true;
+}
+function cvPaste(){
+  const host=cvActiveHost||(cvClipboard&&cvClipboard.host);
+  if(!cvClipboard||!host)return;
+  const it=canvasItem(host.type,host.id);
+  cvSnapshot(host.type,host.id);
+  const o=JSON.parse(JSON.stringify(cvClipboard.el));
+  o.id=uid();o.x=(o.x||30)+18;o.y=(o.y||30)+18;
+  it.canvas.elements.push(o);save();refreshNoteHost(host.type,host.id);selectCanvasEl(host.type,host.id,o.id);
+  cvClipboard={host,el:JSON.parse(JSON.stringify(o))}; // les collages successifs se décalent en cascade
+}
+function cvDuplicate(){
+  if(!cvSel)return;const it=canvasItem(cvSel.type,cvSel.id);const o=it.canvas.elements.find(x=>x.id===cvSel.elId);if(!o)return;
+  cvSnapshot(cvSel.type,cvSel.id);
+  const c=JSON.parse(JSON.stringify(o));c.id=uid();c.x=(c.x||30)+18;c.y=(c.y||30)+18;
+  it.canvas.elements.push(c);save();refreshNoteHost(cvSel.type,cvSel.id);selectCanvasEl(cvSel.type,cvSel.id,c.id);
+}
+function cvLayerBack(){
+  if(!cvSel)return;const it=canvasItem(cvSel.type,cvSel.id);const i=it.canvas.elements.findIndex(x=>x.id===cvSel.elId);
+  if(i>0){cvSnapshot(cvSel.type,cvSel.id);const[o]=it.canvas.elements.splice(i,1);it.canvas.elements.unshift(o);save();refreshNoteHost(cvSel.type,cvSel.id);selectCanvasEl(cvSel.type,cvSel.id,o.id);}
+}
+// Historique (annuler)
+let cvUndo=[];
+function cvSnapshot(type,id){try{const it=canvasItem(type,id);cvUndo.push({type,id,data:JSON.stringify(it.canvas.elements)});if(cvUndo.length>40)cvUndo.shift();}catch(e){}}
+function cvUndoAction(){
+  if(!cvUndo.length)return;
+  const last=cvUndo[cvUndo.length-1];
+  if(!document.getElementById('stage_'+last.type+'_'+last.id))return;
+  cvUndo.pop();
+  const it=canvasItem(last.type,last.id);it.canvas.elements=JSON.parse(last.data);
+  cvSel=null;save();refreshNoteHost(last.type,last.id);
+}
+// Menu clic droit
+function cvMenuOpen(e,type,id,elId){
+  if(cvEditing)return; // pendant l'édition d'un texte : menu normal du navigateur
+  e.preventDefault();e.stopPropagation();
+  selectCanvasEl(type,id,elId);
+  const m=document.getElementById('cvMenu');
+  m.style.left=Math.min(e.clientX,window.innerWidth-195)+'px';
+  m.style.top=Math.min(e.clientY,window.innerHeight-270)+'px';
+  m.classList.add('show');
+}
+function cvMenuClose(){const m=document.getElementById('cvMenu');if(m)m.classList.remove('show');}
 function canvasDragStart(e,type,id,elId,mode){
   if(cvEditing===elId)return; // en cours d'édition de texte → pas de déplacement
   e.preventDefault();e.stopPropagation();
   selectCanvasEl(type,id,elId);
   const it=canvasItem(type,id);const o=it.canvas.elements.find(x=>x.id===elId);if(!o)return;
+  cvSnapshot(type,id);
   const el=document.getElementById('cv_'+elId);
   cvDrag={mode,o,el,sx:e.clientX,sy:e.clientY,ox:o.x,oy:o.y,ow:o.w,oh:o.h};
   window.addEventListener('pointermove',cvDragMove);
@@ -1453,20 +1550,22 @@ function cvDragMove(e){
 function cvDragEnd(){if(cvDrag){save();cvDrag=null;}window.removeEventListener('pointermove',cvDragMove);window.removeEventListener('pointerup',cvDragEnd);}
 function cvSet(type,id,prop,val){if(!cvSel)return;const it=canvasItem(type,id);const o=it.canvas.elements.find(x=>x.id===cvSel.elId);if(!o)return;
   o[prop]=val;const el=document.getElementById('cv_'+o.id);
-  if(prop==='fill'&&el)el.style.background=val;
+  if(prop==='fill'){const sh=document.getElementById('cvsh_'+o.id);(sh||el).style.background=val;}
   if(prop==='color'){const t=document.getElementById('cvtxt_'+o.id);if(t)t.style.color=val;}
   save();}
 function cvFont(type,id,delta){if(!cvSel)return;const it=canvasItem(type,id);const o=it.canvas.elements.find(x=>x.id===cvSel.elId);if(!o||o.type!=='text')return;
   o.fontSize=Math.max(9,Math.min(72,(o.fontSize||16)+delta));const t=document.getElementById('cvtxt_'+o.id);if(t)t.style.fontSize=o.fontSize+'px';save();}
+function cvOpacity(type,id,val){if(!cvSel)return;const it=canvasItem(type,id);const o=it.canvas.elements.find(x=>x.id===cvSel.elId);if(!o)return;
+  o.opacity=Math.max(0.1,Math.min(1,val/100));const el=document.getElementById('cv_'+o.id);if(el)el.style.opacity=o.opacity;save();}
 function cvText(type,id,elId,el){const it=canvasItem(type,id);const o=it.canvas.elements.find(x=>x.id===elId);if(!o)return;
   o.text=el.innerText;clearTimeout(noteTimers['cv'+elId]);noteTimers['cv'+elId]=setTimeout(save,500);}
 function cvEditStart(elId){cvEditing=elId;const t=document.getElementById('cvtxt_'+elId);if(!t)return;
   t.contentEditable='true';t.focus();
   document.getSelection().selectAllChildren(t);
   t.onblur=()=>{t.contentEditable='false';cvEditing=null;t.onblur=null;save();};}
-function cvDelete(type,id){if(!cvSel)return;const it=canvasItem(type,id);it.canvas.elements=it.canvas.elements.filter(x=>x.id!==cvSel.elId);cvSel=null;save();refreshNoteHost(type,id);}
+function cvDelete(type,id){if(!cvSel)return;cvSnapshot(type,id);const it=canvasItem(type,id);it.canvas.elements=it.canvas.elements.filter(x=>x.id!==cvSel.elId);cvSel=null;save();refreshNoteHost(type,id);}
 function cvLayer(type,id){if(!cvSel)return;const it=canvasItem(type,id);const i=it.canvas.elements.findIndex(x=>x.id===cvSel.elId);
-  if(i>=0){const[o]=it.canvas.elements.splice(i,1);it.canvas.elements.push(o);save();refreshNoteHost(type,id);selectCanvasEl(type,id,o.id);}}
+  if(i>=0){cvSnapshot(type,id);const[o]=it.canvas.elements.splice(i,1);it.canvas.elements.push(o);save();refreshNoteHost(type,id);selectCanvasEl(type,id,o.id);}}
 
 function addChap(){const m=getMatiere(currentId);const nom=val('newChapNom');if(!nom)return;
   (m.chapitres=m.chapitres||[]).push({id:uid(),nom,lu:false,ficheUrl:val('newChapFiche'),notes:'',open:false,sources:[],attachments:[]});save();renderContent();renderList();}
@@ -1541,9 +1640,11 @@ function toggleExoFait(id){const m=getMatiere(currentId);const e=m.exercices.fin
 function setEval(id,v){const m=getMatiere(currentId);const e=m.exercices.find(x=>x.id===id);e.eval=(e.eval===v?null:v);if(v&&e.eval)e.fait=true;save();renderContent();renderList();}
 function delExo(id){const m=getMatiere(currentId);m.exercices=m.exercices.filter(x=>x.id!==id);save();renderContent();renderList();}
 
-function addFiche(){const m=getMatiere(currentId);const nom=val('newFicheNom'),url=val('newFicheUrl');if(!nom||!url)return;
-  (m.fiches=m.fiches||[]).push({id:uid(),nom,url});save();renderContent();}
-function delFiche(id){const m=getMatiere(currentId);m.fiches=m.fiches.filter(x=>x.id!==id);save();renderContent();}
+function addFiche(){const m=getMatiere(currentId);const nom=val('newFicheNom')||'Nouvelle fiche';
+  const f={id:uid(),nom,canvas:{elements:[]}};(m.fiches=m.fiches||[]).push(f);save();renderContent();openChapLarge('fiche',f.id);}
+function delFiche(id){const m=getMatiere(currentId);const f=(m.fiches||[]).find(x=>x.id===id);
+  if(!confirm('Supprimer la fiche'+(f?' « '+f.nom+' »':'')+' ?'))return;
+  m.fiches=m.fiches.filter(x=>x.id!==id);save();renderContent();}
 
 function addChapSource(chapId){const m=getMatiere(currentId);const c=m.chapitres.find(x=>x.id===chapId);if(!c)return;
   const nom=val('srcNom_'+chapId);if(!nom)return;
@@ -2025,6 +2126,24 @@ renderList();renderContent();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e));});
 }
+
+// Raccourcis clavier des objets du canvas
+document.addEventListener('keydown',e=>{
+  const ae=document.activeElement;
+  const typing=cvEditing||(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable));
+  // Suppr : supprimer l'objet sélectionné
+  if(e.key==='Delete'&&!typing&&cvSel&&document.getElementById('cv_'+cvSel.elId)){e.preventDefault();cvDelete(cvSel.type,cvSel.id);return;}
+  if(!(e.ctrlKey||e.metaKey))return;
+  const k=e.key.toLowerCase();
+  if(typing)return; // saisie de texte : laisser le copier/coller normal
+  if(k==='c'){ if(cvSel&&document.getElementById('cv_'+cvSel.elId)){e.preventDefault();cvCopy();} }
+  else if(k==='v'){ const host=cvActiveHost||(cvClipboard&&cvClipboard.host); if(cvClipboard&&host&&document.getElementById('stage_'+host.type+'_'+host.id)){e.preventDefault();cvPaste();} }
+  else if(k==='d'){ if(cvSel&&document.getElementById('cv_'+cvSel.elId)){e.preventDefault();cvDuplicate();} }
+  else if(k==='z'){ if(cvUndo.length&&cvActiveHost&&document.getElementById('stage_'+cvActiveHost.type+'_'+cvActiveHost.id)){e.preventDefault();cvUndoAction();} }
+});
+// Fermer le menu clic droit
+document.addEventListener('click',cvMenuClose);
+document.addEventListener('scroll',cvMenuClose,true);
 </script>
 </body>
 </html>
