@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2255%22 font-size=%2280%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>%F0%9F%93%9A</text></svg>">
-<title>RévisO — v2.1</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b6ef0">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RévisO">
+<title>RévisO — v2.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
@@ -528,7 +534,7 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 
 <header class="app-header">
   <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Réduire / afficher la liste des matières">⟨</button>
-  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.1</span></div>
+  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.2</span></div>
   <div class="header-spacer"></div>
   <button class="header-btn" onclick="importData()" title="Importer une sauvegarde">📥 Importer</button>
   <button class="header-btn" onclick="exportData()" title="Exporter la sauvegarde">📤 Exporter</button>
@@ -1871,8 +1877,8 @@ function savePomoSettings(){
 
 // ════════════════ CLOUD / COMPTES (Supabase) ════════════════
 // ▼▼▼ À REMPLIR avec les clés de TON projet Supabase (voir le guide) ▼▼▼
-const SUPABASE_URL='https://ypvtyjikkxjewmnsxahm.supabase.co';
-const SUPABASE_ANON_KEY='sb_publishable_nTQxG33seD7ALgwG8_8cyg_MsnqJobX';
+const SUPABASE_URL='https://TON-PROJET.supabase.co';
+const SUPABASE_ANON_KEY='TA_CLE_ANON_PUBLIC';
 // ▲▲▲ tant que ces 2 valeurs ne sont pas remplies, l'appli reste 100% locale ▲▲▲
 const CLOUD_ENABLED=!/TON-PROJET|TA_CLE_ANON/.test(SUPABASE_URL+SUPABASE_ANON_KEY);
 let sb=null,currentUser=null,cloudTimer=null;
@@ -2014,6 +2020,11 @@ renderList();renderContent();
   if(data&&data.session){currentUser=data.session.user;onLoggedIn();}
   else showAuth(true);
 })();
+
+// PWA : enregistrement du service worker (seulement en ligne, pas en local file://)
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e));});
+}
 </script>
 </body>
 </html>
