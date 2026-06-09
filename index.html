@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RévisO">
-<title>RévisO — v2.8</title>
+<title>RévisO — v3.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
@@ -592,10 +592,8 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 
 <header class="app-header">
   <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Réduire / afficher la liste des matières">⟨</button>
-  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.8</span></div>
+  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v3.0</span></div>
   <div class="header-spacer"></div>
-  <button class="header-btn" onclick="importData()" title="Importer une sauvegarde">📥 Importer</button>
-  <button class="header-btn" onclick="exportData()" title="Exporter la sauvegarde">📤 Exporter</button>
   <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
   <button class="header-btn" onclick="openColorModal()" id="colorBtn" title="Personnaliser les couleurs">🎨</button>
   <button class="header-btn" onclick="toggleTheme()" id="themeBtn" title="Basculer jour / nuit">🌙 Nuit</button>
@@ -2145,19 +2143,20 @@ function updateFriendsBadge(){
 }
 
 async function setUsername(){
-  const name=lc(document.getElementById('myUsername').value).replace(/[^a-z0-9_.-]/g,'');
+  const name=(document.getElementById('myUsername').value||'').trim().replace(/[^A-Za-z0-9_.\-]/g,'');
   if(name.length<3){socMsg('Pseudo : au moins 3 caractères (lettres, chiffres, . _ -).',true);return;}
   const {error}=await sb.from('profiles').update({username:name}).eq('id',currentUser.id);
   if(error){socMsg(error.message.includes('duplicate')||error.code==='23505'?'Ce pseudo est déjà pris.':'Erreur : '+error.message,true);return;}
   myProfile.username=name;socMsg('Pseudo enregistré : '+name);
 }
 async function addFriend(){
-  const q=lc(document.getElementById('friendQuery').value);
-  if(!q){socMsg('Entre un e-mail ou un pseudo.',true);return;}
-  if(q===lc(currentUser.email)||(myProfile&&q===myProfile.username)){socMsg('C\u2019est toi 🙂',true);return;}
+  const raw=(document.getElementById('friendQuery').value||'').trim();
+  if(!raw){socMsg('Entre un e-mail ou un pseudo.',true);return;}
+  const ql=raw.toLowerCase();
+  if(ql===lc(currentUser.email)||(myProfile&&myProfile.username&&ql===myProfile.username.toLowerCase())){socMsg('C\u2019est toi 🙂',true);return;}
   socMsg('Recherche...');
-  const {data:found}=await sb.from('profiles').select('id,email,username').or(`email.eq.${q},username.eq.${q}`).maybeSingle();
-  if(!found){socMsg('Aucun utilisateur trouvé avec « '+q+' ». (Il doit s\u2019être déjà connecté au moins une fois.)',true);return;}
+  const {data:found}=await sb.from('profiles').select('id,email,username').or(`email.ilike.${raw},username.ilike.${raw}`).maybeSingle();
+  if(!found){socMsg('Aucun utilisateur trouvé avec « '+raw+' ». (Il doit s\u2019être déjà connecté au moins une fois.)',true);return;}
   if(found.id===currentUser.id){socMsg('C\u2019est toi 🙂',true);return;}
   const {error}=await sb.from('friendships').insert({requester:currentUser.id,addressee:found.id,status:'pending'});
   if(error){socMsg(error.code==='23505'?'Demande déjà existante (ou déjà ami).':'Erreur : '+error.message,true);return;}
