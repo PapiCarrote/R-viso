@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RévisO">
-<title>RévisO — v2.7</title>
+<title>RévisO — v2.8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
@@ -399,6 +399,13 @@ body.sidebar-collapsed #sidebarToggle{transform:rotate(180deg);}
 .cloud-status{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:600;}
 .cloud-status.show{opacity:1;}
 .fiche-item{cursor:pointer;}
+.soc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+.soc-block{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;}
+.soc-block.soc-wide{grid-column:1 / -1;}
+.soc-h{font-family:'Quicksand',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text);}
+.soc-acts{display:flex;gap:6px;flex-shrink:0;}
+.nav-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;background:var(--accent);color:var(--accent-text);border-radius:9px;font-size:11px;font-weight:700;}
+@media(max-width:640px){.soc-grid{grid-template-columns:1fr;}}
 .fiches-hint{font-size:12.5px;color:var(--text-sec);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:12px;line-height:1.5;}
 .admin-modal{max-width:520px;}
 .adm-label{display:block;font-size:12px;font-weight:700;color:var(--text-sec);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px;}
@@ -408,6 +415,16 @@ body.sidebar-collapsed #sidebarToggle{transform:rotate(180deg);}
 .adm-row:hover{background:var(--bg-hover);}
 .adm-mail{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .adm-info{font-size:11px;color:var(--text-muted);}
+.friends-badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;background:var(--danger,#e2649a);color:#fff;font-size:10px;font-weight:700;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.soc-banner{background:var(--accent-glow);border:1px solid var(--accent);color:var(--accent-dark);border-radius:8px;padding:8px 11px;font-size:13px;font-weight:600;margin-bottom:10px;}
+.soc-inline{display:flex;gap:8px;align-items:center;}
+.soc-inline .quiz-input{flex:1;}
+.soc-list{display:flex;flex-direction:column;gap:6px;max-height:150px;overflow:auto;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;background:var(--bg-2);}
+.soc-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;}
+.soc-row:hover{background:var(--bg-hover);}
+.soc-name{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.soc-name small{font-weight:400;color:var(--text-muted);}
+.soc-mat{font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text);max-width:130px;}
 .color-note{font-size:12.5px;color:var(--text-sec);line-height:1.6;margin-bottom:16px;background:var(--bg-2);padding:10px 12px;border-radius:var(--radius-sm);}
 .color-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
 .color-row:last-of-type{border-bottom:none;}
@@ -520,6 +537,16 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
   <button class="cv-menu-del" onclick="cvDelete(cvSel.type,cvSel.id);cvMenuClose()">🗑 Supprimer <kbd>Suppr</kbd></button>
 </div>
 
+<!-- MODAL AMIS & PARTAGE -->
+<div class="modal-overlay" id="friendsModal">
+  <div class="modal admin-modal">
+    <h2>👥 Amis & partage</h2>
+    <p class="color-note">Ajoute des amis par e-mail ou pseudo, puis envoie-leur tes fiches de révision.</p>
+    <div id="friendsBody"></div>
+    <div class="modal-actions"><button class="btn" onclick="closeFriendsModal()">Fermer</button></div>
+  </div>
+</div>
+
 <!-- MODAL ADMIN -->
 <div class="modal-overlay" id="adminModal">
   <div class="modal admin-modal">
@@ -565,13 +592,14 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 
 <header class="app-header">
   <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Réduire / afficher la liste des matières">⟨</button>
-  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.7</span></div>
+  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v2.8</span></div>
   <div class="header-spacer"></div>
   <button class="header-btn" onclick="importData()" title="Importer une sauvegarde">📥 Importer</button>
   <button class="header-btn" onclick="exportData()" title="Exporter la sauvegarde">📤 Exporter</button>
   <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
   <button class="header-btn" onclick="openColorModal()" id="colorBtn" title="Personnaliser les couleurs">🎨</button>
   <button class="header-btn" onclick="toggleTheme()" id="themeBtn" title="Basculer jour / nuit">🌙 Nuit</button>
+  <button class="header-btn" onclick="openFriendsModal()" id="friendsBtn" title="Amis & partage" style="display:none;position:relative">👥 Amis<span class="friends-badge" id="friendsBadge" style="display:none">0</span></button>
   <button class="header-btn" onclick="openAdminModal()" id="adminBtn" title="Espace administrateur" style="display:none">🛠️ Admin</button>
   <button class="header-btn" onclick="authLogout()" id="accountBtn" title="Mon compte" style="display:none">👤 Déconnexion</button>
 </header>
@@ -580,6 +608,7 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
   <div class="left-panel">
     <div class="panel-top">
       <div class="nav-home" id="navHome" onclick="goHome()"><span>🏠</span> Tableau de bord</div>
+      <div class="nav-home" id="navSocial" onclick="goSocial()"><span>👥</span> Social <span class="nav-badge" id="socialBadge" style="display:none"></span></div>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input type="text" placeholder="Rechercher (matières, chapitres, notes...)" id="searchInput" oninput="renderList()">
@@ -782,6 +811,7 @@ function progression(m){
 
 // ════════════════ NAVIGATION ════════════════
 function goHome(){view='home';currentId=null;quiz.playing=false;renderList();renderContent();}
+function goSocial(){view='social';currentId=null;quiz.playing=false;renderList();renderContent();loadSocial();}
 function selectMatiere(id){view='matiere';currentId=id;activeTab='general';quiz.playing=false;renderList();renderContent();}
 function setTab(t){if(t!=='quiz')quiz.playing=false;activeTab=t;renderContent();}
 
@@ -816,6 +846,7 @@ function renderList(){
   document.getElementById('searchClear').classList.toggle('show',!!document.getElementById('searchInput').value);
   const list=document.getElementById('matiereList');
   document.getElementById('navHome').classList.toggle('active',view==='home');
+  document.getElementById('navSocial').classList.toggle('active',view==='social');
   const dragOn=(sortMode==='manuel'&&!q);
   let filtered=sortedMatieres(matieres).map(m=>({m,...matchMatiere(m,q)})).filter(o=>o.match);
   if(filtered.length===0){
@@ -859,6 +890,7 @@ function dropMat(e,targetId){
 function renderContent(){
   const c=document.getElementById('contentArea');
   if(view==='home'){c.style.removeProperty('--mc');c.innerHTML=renderHome();return;}
+  if(view==='social'){c.style.removeProperty('--mc');c.innerHTML=renderSocial();return;}
   const m=getMatiere(currentId);
   if(!m){c.style.removeProperty('--mc');c.innerHTML=emptyState();return;}
   c.style.setProperty('--mc',matColor(m));
@@ -870,6 +902,7 @@ function renderContent(){
       <div class="banner-title">${esc(m.nom)}</div>
       <div class="banner-actions">
         <button class="icon-btn" onclick="exportMatierePDF()" title="Exporter en PDF / imprimer">🖨️</button>
+        <button class="icon-btn" onclick="shareMatiere(${m.id})" title="Envoyer ce cours à un ami">📤</button>
         <button class="icon-btn" onclick="openMatiereModal(${m.id})" title="Modifier">✏️</button>
         <button class="icon-btn del" onclick="deleteMatiere(${m.id})" title="Supprimer">🗑</button>
       </div>
@@ -1152,6 +1185,7 @@ function tabFiches(m){
       <div class="row-main"><div class="row-name">📝 ${esc(x.nom)}</div>
         <div class="row-sub">${n} élément(s)${ext}</div></div>
       <div class="row-actions" onclick="event.stopPropagation()">
+        <span class="row-expand" onclick="shareFiche('${x.id}')" title="Envoyer à un ami">✈️</span>
         <span class="row-expand" onclick="openChapLarge('fiche','${x.id}')" title="Ouvrir la fiche">⛶</span>
         <span class="del-x" onclick="delFiche('${x.id}')">×</span>
       </div></div>`;}).join(''):'<div class="empty-mini">Aucune fiche pour l\'instant. Crée ta première fiche de révision visuelle !</div>';
@@ -2056,17 +2090,169 @@ async function authReset(){
   const {error}=await sb.auth.resetPasswordForEmail(email);
   authMsg(error?traduitErreur(error.message):'E-mail de réinitialisation envoyé (vérifie tes spams).',!!error);
 }
-async function authLogout(){if(sb)await sb.auth.signOut();currentUser=null;document.getElementById('accountBtn').style.display='none';showAuth(true);}
+async function authLogout(){if(sb)await sb.auth.signOut();currentUser=null;document.getElementById('accountBtn').style.display='none';document.getElementById('friendsBtn').style.display='none';showAuth(true);}
 function onLoggedIn(){
   showAuth(false);
   const ab=document.getElementById('accountBtn');ab.style.display='inline-flex';
   ab.title='Connecté : '+(currentUser.email||'');
   checkAdmin();
+  ensureProfile();
   cloudLoad();
+  loadSocial();
 }
 
-// ── Page administrateur : pré-assigner un JSON à un e-mail ──
-let isAdmin=false,adminPendingData=null;
+// ════════════════ AMIS & PARTAGE DE FICHES ════════════════
+let myProfile=null,friendsList=[],friendReqs=[],receivedFiches=[],ficheToSend=null,matToSend=null;
+function lc(s){return (s||'').trim().toLowerCase();}
+
+async function ensureProfile(){
+  try{
+    await sb.from('profiles').upsert({id:currentUser.id,email:lc(currentUser.email),updated_at:new Date().toISOString()},{onConflict:'id'});
+    const {data}=await sb.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
+    myProfile=data||{id:currentUser.id,email:lc(currentUser.email),username:null};
+  }catch(e){console.warn('profil:',e);}
+}
+function myName(){return (myProfile&&myProfile.username)||currentUser.email;}
+
+async function loadSocial(){
+  if(!sb||!currentUser)return;
+  try{
+    // amitiés acceptées + demandes reçues
+    const {data:fr}=await sb.from('friendships').select('*').or(`requester.eq.${currentUser.id},addressee.eq.${currentUser.id}`);
+    const all=fr||[];
+    const accepted=all.filter(f=>f.status==='accepted');
+    friendReqs=all.filter(f=>f.status==='pending'&&f.addressee===currentUser.id);
+    // profils des autres
+    const otherIds=[...new Set(all.map(f=>f.requester===currentUser.id?f.addressee:f.requester))];
+    let profs=[];
+    if(otherIds.length){const {data:ps}=await sb.from('profiles').select('id,email,username').in('id',otherIds);profs=ps||[];}
+    const pmap={};profs.forEach(p=>pmap[p.id]=p);
+    friendsList=accepted.map(f=>{const oid=f.requester===currentUser.id?f.addressee:f.requester;return {fid:f.id,id:oid,profile:pmap[oid]||{email:'(inconnu)'}};});
+    friendReqs=friendReqs.map(f=>({fid:f.id,id:f.requester,profile:pmap[f.requester]||{email:'(inconnu)'}}));
+    // fiches reçues
+    const {data:sh}=await sb.from('shared_fiches').select('*').eq('recipient',currentUser.id).order('created_at',{ascending:false});
+    receivedFiches=sh||[];
+  }catch(e){console.warn('social:',e);}
+  if(view==='social')renderContent();
+  updateFriendsBadge();
+}
+function updateFriendsBadge(){
+  const n=friendReqs.length+receivedFiches.length;
+  const bdg=document.getElementById('friendsBadge');
+  if(bdg){bdg.textContent=n;bdg.style.display=n>0?'flex':'none';}
+  const nav=document.getElementById('socialBadge');
+  if(nav){nav.textContent=n;nav.style.display=n>0?'inline-flex':'none';}
+}
+
+async function setUsername(){
+  const name=lc(document.getElementById('myUsername').value).replace(/[^a-z0-9_.-]/g,'');
+  if(name.length<3){socMsg('Pseudo : au moins 3 caractères (lettres, chiffres, . _ -).',true);return;}
+  const {error}=await sb.from('profiles').update({username:name}).eq('id',currentUser.id);
+  if(error){socMsg(error.message.includes('duplicate')||error.code==='23505'?'Ce pseudo est déjà pris.':'Erreur : '+error.message,true);return;}
+  myProfile.username=name;socMsg('Pseudo enregistré : '+name);
+}
+async function addFriend(){
+  const q=lc(document.getElementById('friendQuery').value);
+  if(!q){socMsg('Entre un e-mail ou un pseudo.',true);return;}
+  if(q===lc(currentUser.email)||(myProfile&&q===myProfile.username)){socMsg('C\u2019est toi 🙂',true);return;}
+  socMsg('Recherche...');
+  const {data:found}=await sb.from('profiles').select('id,email,username').or(`email.eq.${q},username.eq.${q}`).maybeSingle();
+  if(!found){socMsg('Aucun utilisateur trouvé avec « '+q+' ». (Il doit s\u2019être déjà connecté au moins une fois.)',true);return;}
+  if(found.id===currentUser.id){socMsg('C\u2019est toi 🙂',true);return;}
+  const {error}=await sb.from('friendships').insert({requester:currentUser.id,addressee:found.id,status:'pending'});
+  if(error){socMsg(error.code==='23505'?'Demande déjà existante (ou déjà ami).':'Erreur : '+error.message,true);return;}
+  socMsg('Demande envoyée à '+(found.username||found.email)+' ✅');
+  document.getElementById('friendQuery').value='';loadSocial();
+}
+async function acceptFriend(fid){await sb.from('friendships').update({status:'accepted'}).eq('id',fid);await loadSocial();renderFriends();}
+async function refuseFriend(fid){await sb.from('friendships').delete().eq('id',fid);await loadSocial();renderFriends();}
+async function removeFriend(fid){if(!confirm('Retirer cet ami ?'))return;await sb.from('friendships').delete().eq('id',fid);await loadSocial();renderFriends();}
+
+async function doSend(friendId){
+  if(matToSend!=null){
+    const m=getMatiere(matToSend);if(!m){socMsg('Matière introuvable.',true);return;}
+    const payload={__matiere:true,nom:m.nom,data:JSON.parse(JSON.stringify(m))};
+    const {error}=await sb.from('shared_fiches').insert({sender:currentUser.id,recipient:friendId,sender_name:myName(),fiche:payload});
+    if(error){socMsg('Erreur d\u2019envoi : '+error.message,true);return;}
+    matToSend=null;closeFriendsModal();flash('Cours envoyé ✓');return;
+  }
+  if(ficheToSend){
+    const m=getMatiere(currentId);const f=(m.fiches||[]).find(x=>x.id===ficheToSend);
+    if(!f){socMsg('Fiche introuvable.',true);return;}
+    const payload={nom:f.nom,canvas:f.canvas||{elements:[]}};
+    const {error}=await sb.from('shared_fiches').insert({sender:currentUser.id,recipient:friendId,sender_name:myName(),fiche:payload});
+    if(error){socMsg('Erreur d\u2019envoi : '+error.message,true);return;}
+    ficheToSend=null;closeFriendsModal();flash('Fiche envoyée ✓');return;
+  }
+}
+async function acceptFiche(sharedId,matId){
+  const sh=receivedFiches.find(x=>x.id===sharedId);if(!sh)return;
+  const fdata=sh.fiche||{};
+  if(fdata.__matiere){ // c'est un cours (matière entière)
+    const m=JSON.parse(JSON.stringify(fdata.data||{}));
+    m.id=nextId++;
+    (m.chapitres||[]).forEach(c=>c.id=uid());(m.exercices||[]).forEach(e=>e.id=uid());(m.fiches||[]).forEach(f=>f.id=uid());
+    m.nom=(fdata.nom||m.nom||'Cours')+' (reçu)';
+    matieres.push(m);save();
+    await sb.from('shared_fiches').delete().eq('id',sharedId);
+    await loadSocial();renderContent();renderList();flash('Cours ajouté à tes matières ✓');return;
+  }
+  const m=matieres.find(x=>String(x.id)===String(matId));if(!m){socMsg('Choisis une matière.',true);return;}
+  (m.fiches=m.fiches||[]).push({id:uid(),nom:(fdata.nom||'Fiche reçue')+' (reçue)',canvas:fdata.canvas||{elements:[]}});
+  save();
+  await sb.from('shared_fiches').delete().eq('id',sharedId);
+  await loadSocial();renderContent();renderList();
+  flash('Fiche ajoutée à « '+m.nom+' » ✓');
+}
+async function rejectFiche(sharedId){await sb.from('shared_fiches').delete().eq('id',sharedId);await loadSocial();renderFriends();}
+
+// ── Sélecteur d'ami pour l'envoi (modal léger) ──
+function socMsg(t,err){const m=document.getElementById('socMsg');if(m){m.textContent=t||'';m.className='auth-msg '+(err?'err':'ok');}}
+function openFriendsModal(){if(!currentUser)return;loadSocial().then(renderFriends);document.getElementById('friendsModal').classList.add('show');}
+function closeFriendsModal(){document.getElementById('friendsModal').classList.remove('show');ficheToSend=null;matToSend=null;}
+function shareFiche(ficheId){if(!currentUser){alert('Connecte-toi pour partager des fiches.');return;}ficheToSend=ficheId;matToSend=null;openFriendsModal();}
+function shareMatiere(id){if(!currentUser){alert('Connecte-toi pour partager un cours.');return;}matToSend=id;ficheToSend=null;openFriendsModal();}
+function renderFriends(){
+  let banner='';
+  if(matToSend!=null){const m=getMatiere(matToSend);banner=`<div class="soc-banner">✈️ Envoyer le cours « ${esc(m?m.nom:'')} » à…</div>`;}
+  else if(ficheToSend){const m=getMatiere(currentId);const f=(m.fiches||[]).find(x=>x.id===ficheToSend);banner=`<div class="soc-banner">✈️ Envoyer la fiche « ${esc(f?f.nom:'')} » à…</div>`;}
+  const friends=friendsList.length?friendsList.map(fr=>{
+    const name=fr.profile.username?('@'+fr.profile.username):fr.profile.email;
+    return `<div class="soc-row"><span class="soc-name">${esc(name)}</span><button class="btn-sm" onclick="doSend('${fr.id}')">✈️ Envoyer</button></div>`;}).join(''):'<div class="empty-mini">Aucun ami. Ajoute des amis dans l\'onglet Social.</div>';
+  document.getElementById('friendsBody').innerHTML=banner+'<label class="adm-label">Choisis un ami</label><div class="soc-list">'+friends+'</div>';
+}
+
+// ── Onglet SOCIAL (réutilise le backend ci-dessus) ──
+function renderSocial(){
+  if(!sb||!currentUser){
+    return `<div class="banner"><div class="banner-title">👥 Social</div></div>
+      <div class="empty-mini" style="margin-top:14px">Connecte-toi à ton compte pour ajouter des amis et échanger tes cours et fiches.</div>`;
+  }
+  const reqs=friendReqs.length?friendReqs.map(r=>{const name=r.profile.username?('@'+r.profile.username):r.profile.email;
+    return `<div class="soc-row"><span class="soc-name">${esc(name)}</span><span class="soc-acts"><button class="btn-sm" onclick="acceptFriend('${r.fid}')">✓ Accepter</button><button class="btn-sm sec" onclick="refuseFriend('${r.fid}')">Refuser</button></span></div>`;}).join(''):'<div class="empty-mini">Aucune demande reçue.</div>';
+  const friends=friendsList.length?friendsList.map(fr=>{const name=fr.profile.username?('@'+fr.profile.username):fr.profile.email;
+    return `<div class="soc-row"><span class="soc-name">🟢 ${esc(name)}</span><span class="del-x" onclick="removeFriend('${fr.fid}')" title="Retirer">×</span></div>`;}).join(''):'<div class="empty-mini">Pas encore d\'amis.</div>';
+  const matOpts=matieres.map(m=>`<option value="${m.id}">${esc(m.nom)}</option>`).join('');
+  const recv=receivedFiches.length?receivedFiches.map(s=>{
+    const fd=s.fiche||{};const isMat=!!fd.__matiere;const nm=fd.nom||(isMat?'Cours':'Fiche');
+    const action=isMat
+      ? `<button class="btn-sm" onclick="acceptFiche('${s.id}','')">+ Ajouter le cours</button>`
+      : `<select class="soc-mat" id="recvmat_${s.id}">${matOpts||'<option value="">Crée une matière</option>'}</select><button class="btn-sm" onclick="acceptFiche('${s.id}',document.getElementById('recvmat_${s.id}').value)">+ Ajouter</button>`;
+    return `<div class="soc-row soc-recv"><span class="soc-name">${isMat?'📚':'📝'} ${esc(nm)}<small> de ${esc(s.sender_name||'?')}</small></span>${action}<span class="del-x" onclick="rejectFiche('${s.id}')" title="Refuser">×</span></div>`;}).join(''):'<div class="empty-mini">Aucun cours ou fiche reçu pour l\'instant.</div>';
+  return `
+    <div class="banner"><div class="banner-title">👥 Social</div></div>
+    <div class="soc-grid">
+      <div class="soc-block"><div class="soc-h">Mon pseudo</div>
+        <div class="add-inline"><input class="grow" id="myUsername" placeholder="pseudo (visible par tes amis)" value="${(myProfile&&myProfile.username)?esc(myProfile.username):''}"><button class="btn-sm" onclick="setUsername()">Enregistrer</button></div>
+        <div class="auth-msg" id="socMsg"></div></div>
+      <div class="soc-block"><div class="soc-h">Ajouter un ami</div>
+        <div class="add-inline"><input class="grow" id="friendQuery" placeholder="e-mail ou pseudo de ton ami"><button class="btn-sm" onclick="addFriend()">+ Demander</button></div></div>
+      <div class="soc-block"><div class="soc-h">Demandes reçues</div>${reqs}</div>
+      <div class="soc-block"><div class="soc-h">Mes amis</div>${friends}</div>
+      <div class="soc-block soc-wide"><div class="soc-h">📥 Reçus (cours & fiches)</div>${recv}</div>
+    </div>
+    <div class="fiches-hint" style="margin-top:14px">Pour <b>envoyer un cours</b> : ouvre une matière → bouton <b>📤</b> dans l'en-tête. Pour <b>une fiche</b> : onglet Fiches → <b>📤</b> sur la fiche.</div>`;
+}
 async function checkAdmin(){
   isAdmin=false;
   try{
@@ -2116,7 +2302,6 @@ function traduitErreur(m){m=(m||'').toLowerCase();
   if(m.includes('rate'))return 'Trop de tentatives, réessaie dans un instant.';
   return m;}
 
-// ════════════════ INIT ════════════════
 load();loadObj();loadStats();loadPomo();
 try{const t=localStorage.getItem('reviso_theme');if(t==='dark')toggleTheme();}catch(e){}
 loadColors();applyCustomColors();
