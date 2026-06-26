@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RévisO">
-<title>RévisO — v3.0</title>
+<title>RévisO — v3.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
@@ -425,6 +425,76 @@ body.sidebar-collapsed #sidebarToggle{transform:rotate(180deg);}
 .soc-name{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .soc-name small{font-weight:400;color:var(--text-muted);}
 .soc-mat{font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text);max-width:130px;}
+/* ── GROUPES ── */
+.grp-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);}
+.grp-tab{padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid transparent;border-bottom:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-sec);background:none;transition:all var(--tr);margin-bottom:-2px;}
+.grp-tab.active{background:var(--bg-1);border-color:var(--border);border-bottom-color:var(--bg-1);color:var(--accent);}
+.grp-tab:hover:not(.active){color:var(--text);}
+.grp-list{display:flex;flex-direction:column;gap:8px;}
+.grp-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;transition:all var(--tr);}
+.grp-card:hover{border-color:var(--accent);background:var(--accent-glow);}
+.grp-card-top{display:flex;align-items:center;gap:10px;}
+.grp-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.grp-info{flex:1;min-width:0;}
+.grp-name{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.grp-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.grp-open-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--accent);background:var(--accent-glow);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--tr);}
+.grp-open-btn:hover{background:var(--accent);color:var(--accent-text);}
+.grp-panel-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-1);border-bottom:1px solid var(--border);flex-shrink:0;}
+.grp-back{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--bg-2);color:var(--text-sec);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all var(--tr);}
+.grp-back:hover{border-color:var(--accent);color:var(--accent);}
+.grp-panel-name{font-weight:700;font-size:15px;}
+.grp-panel-members{font-size:11px;color:var(--text-muted);}
+.grp-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
+.grp-msg{max-width:75%;display:flex;flex-direction:column;gap:3px;}
+.grp-msg.mine{align-self:flex-end;align-items:flex-end;}
+.grp-msg.theirs{align-self:flex-start;align-items:flex-start;}
+.grp-msg-bubble{padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.45;word-break:break-word;}
+.grp-msg.mine .grp-msg-bubble{background:var(--accent);color:var(--accent-text);border-bottom-right-radius:3px;}
+.grp-msg.theirs .grp-msg-bubble{background:var(--bg-2);border:1px solid var(--border);border-bottom-left-radius:3px;}
+.grp-msg-meta{font-size:10px;color:var(--text-muted);}
+.grp-msg-file{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;transition:all var(--tr);text-decoration:none;color:inherit;}
+.grp-msg-file:hover{border-color:var(--accent);color:var(--accent);}
+.grp-msg.mine .grp-msg-file{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.35);color:var(--accent-text);}
+.grp-input-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-1);border-top:1px solid var(--border);flex-shrink:0;}
+.grp-input-bar input{flex:1;height:38px;padding:0 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border var(--tr);}
+.grp-input-bar input:focus{border-color:var(--accent);}
+.grp-attach-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--bg-2);color:var(--text-sec);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all var(--tr);flex-shrink:0;}
+.grp-attach-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);}
+.grp-send-btn{width:38px;height:38px;border-radius:10px;border:none;background:var(--accent);color:var(--accent-text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:filter var(--tr);flex-shrink:0;}
+.grp-send-btn:hover{filter:brightness(1.1);}
+.grp-create-form{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.grp-section-title{font-family:'Quicksand',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text);}
+.grp-invite-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;background:var(--bg-2);border:1px solid var(--border);margin-bottom:5px;}
+.grp-invite-name{flex:1;font-size:13px;font-weight:600;}
+.grp-invite-check{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+.grp-pdf-preview{font-size:11px;color:var(--text-muted);padding:4px 10px;background:var(--bg-2);border-radius:6px;border:1px solid var(--border);cursor:pointer;margin:0 14px 6px;}
+.grp-chat-wrap{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;height:440px;}
+/* ── GROUPE : onglets internes ── */
+.grp-inner-tabs{display:flex;gap:0;flex-shrink:0;border-bottom:2px solid var(--border);}
+.grp-inner-tab{flex:1;padding:9px 6px;border:none;border-bottom:2px solid transparent;cursor:pointer;font-size:12px;font-weight:700;color:var(--text-muted);background:none;transition:all var(--tr);margin-bottom:-2px;text-align:center;}
+.grp-inner-tab.active{border-bottom-color:var(--accent);color:var(--accent);}
+.grp-panel{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.grp-panel.active{display:flex;}
+/* Fichiers */
+.grp-files-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;padding:14px;overflow-y:auto;flex:1;}
+.grp-file-card{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all var(--tr);text-decoration:none;color:inherit;}
+.grp-file-card:hover{border-color:var(--accent);background:var(--accent-glow);}
+.grp-file-icon{font-size:28px;}
+.grp-file-name{font-size:11px;font-weight:600;text-align:center;word-break:break-all;line-height:1.3;}
+.grp-file-meta{font-size:10px;color:var(--text-muted);}
+.grp-files-upload{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-1);border-top:1px solid var(--border);flex-shrink:0;}
+/* Document partagé */
+.grp-doc-toolbar{display:flex;align-items:center;gap:5px;padding:7px 10px;background:var(--bg-1);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.grp-doc-btn{padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg-2);color:var(--text-sec);font-size:12px;font-weight:700;cursor:pointer;transition:all var(--tr);}
+.grp-doc-btn:hover{border-color:var(--accent);color:var(--accent);}
+.grp-doc-sep{width:1px;height:20px;background:var(--border);margin:0 2px;}
+.grp-doc-editor{flex:1;overflow-y:auto;padding:16px 20px;font-size:14px;line-height:1.75;outline:none;font-family:'Nunito',sans-serif;color:var(--text);background:var(--bg-input);}
+.grp-doc-editor:empty:before{content:attr(data-placeholder);color:var(--text-muted);pointer-events:none;}
+.grp-doc-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--bg-1);border-top:1px solid var(--border);flex-shrink:0;}
+.grp-doc-status{font-size:11px;color:var(--text-muted);font-style:italic;}
+.grp-doc-status.saving{color:var(--accent);}
+.grp-doc-status.saved{color:#22c55e;}
 .color-note{font-size:12.5px;color:var(--text-sec);line-height:1.6;margin-bottom:16px;background:var(--bg-2);padding:10px 12px;border-radius:var(--radius-sm);}
 .color-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
 .color-row:last-of-type{border-bottom:none;}
@@ -592,7 +662,7 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
 
 <header class="app-header">
   <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Réduire / afficher la liste des matières">⟨</button>
-  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v3.0</span></div>
+  <div class="logo"><div class="logo-icon">📚</div><em>Révis</em>O<span class="version-badge">v3.1</span></div>
   <div class="header-spacer"></div>
   <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
   <button class="header-btn" onclick="openColorModal()" id="colorBtn" title="Personnaliser les couleurs">🎨</button>
@@ -625,7 +695,6 @@ body.borders-off .stats-week,body.borders-off .stats-top{box-shadow:0 2px 12px r
       </select>
     </div>
     <div class="matiere-list" id="matiereList"></div>
-    <div class="list-count" id="listCount">0 matière(s)</div>
   </div>
 
   <div class="content-area" id="contentArea"></div>
@@ -867,7 +936,7 @@ function renderList(){
       </div>`;
     }).join('');
   }
-  document.getElementById('listCount').textContent=q?`${filtered.length} résultat(s)`:`${matieres.length} matière(s)`;
+  document.getElementById('listCount')&&(document.getElementById('listCount').textContent=q?`${filtered.length} résultat(s)`:`${matieres.length} matière(s)`);
 }
 
 // drag & drop matières
@@ -2225,7 +2294,8 @@ function renderFriends(){
 function renderSocial(){
   if(!sb||!currentUser){
     return `<div class="banner"><div class="banner-title">👥 Social</div></div>
-      <div class="empty-mini" style="margin-top:14px">Connecte-toi à ton compte pour ajouter des amis et échanger tes cours et fiches.</div>`;
+      <div class="empty-mini" style="margin-top:14px">Connecte-toi à ton compte pour ajouter des amis et échanger tes cours et fiches.</div>
+      <div style="text-align:center;margin-top:18px"><button class="btn btn-accent" onclick="showAuth(true)">Se connecter</button></div>`;
   }
   const reqs=friendReqs.length?friendReqs.map(r=>{const name=r.profile.username?('@'+r.profile.username):r.profile.email;
     return `<div class="soc-row"><span class="soc-name">${esc(name)}</span><span class="soc-acts"><button class="btn-sm" onclick="acceptFriend('${r.fid}')">✓ Accepter</button><button class="btn-sm sec" onclick="refuseFriend('${r.fid}')">Refuser</button></span></div>`;}).join(''):'<div class="empty-mini">Aucune demande reçue.</div>';
@@ -2240,18 +2310,387 @@ function renderSocial(){
     return `<div class="soc-row soc-recv"><span class="soc-name">${isMat?'📚':'📝'} ${esc(nm)}<small> de ${esc(s.sender_name||'?')}</small></span>${action}<span class="del-x" onclick="rejectFiche('${s.id}')" title="Refuser">×</span></div>`;}).join(''):'<div class="empty-mini">Aucun cours ou fiche reçu pour l\'instant.</div>';
   return `
     <div class="banner"><div class="banner-title">👥 Social</div></div>
-    <div class="soc-grid">
-      <div class="soc-block"><div class="soc-h">Mon pseudo</div>
-        <div class="add-inline"><input class="grow" id="myUsername" placeholder="pseudo (visible par tes amis)" value="${(myProfile&&myProfile.username)?esc(myProfile.username):''}"><button class="btn-sm" onclick="setUsername()">Enregistrer</button></div>
-        <div class="auth-msg" id="socMsg"></div></div>
-      <div class="soc-block"><div class="soc-h">Ajouter un ami</div>
-        <div class="add-inline"><input class="grow" id="friendQuery" placeholder="e-mail ou pseudo de ton ami"><button class="btn-sm" onclick="addFriend()">+ Demander</button></div></div>
-      <div class="soc-block"><div class="soc-h">Demandes reçues</div>${reqs}</div>
-      <div class="soc-block"><div class="soc-h">Mes amis</div>${friends}</div>
-      <div class="soc-block soc-wide"><div class="soc-h">📥 Reçus (cours & fiches)</div>${recv}</div>
+    <div class="grp-tabs">
+      <button class="grp-tab active" id="socTabAmis" onclick="switchSocTab('amis')">👥 Amis & Partage</button>
+      <button class="grp-tab" id="socTabGroupes" onclick="switchSocTab('groupes')">💬 Groupes</button>
     </div>
-    <div class="fiches-hint" style="margin-top:14px">Pour <b>envoyer un cours</b> : ouvre une matière → bouton <b>📤</b> dans l'en-tête. Pour <b>une fiche</b> : onglet Fiches → <b>📤</b> sur la fiche.</div>`;
+    <div id="socPanelAmis">
+      <div class="soc-grid">
+        <div class="soc-block"><div class="soc-h">Mon pseudo</div>
+          <div class="add-inline"><input class="grow" id="myUsername" placeholder="pseudo (visible par tes amis)" value="${(myProfile&&myProfile.username)?esc(myProfile.username):''}"><button class="btn-sm" onclick="setUsername()">Enregistrer</button></div>
+          <div class="auth-msg" id="socMsg"></div></div>
+        <div class="soc-block"><div class="soc-h">Ajouter un ami</div>
+          <div class="add-inline"><input class="grow" id="friendQuery" placeholder="e-mail ou pseudo de ton ami"><button class="btn-sm" onclick="addFriend()">+ Demander</button></div></div>
+        <div class="soc-block"><div class="soc-h">Demandes reçues</div>${reqs}</div>
+        <div class="soc-block"><div class="soc-h">Mes amis</div>${friends}</div>
+        <div class="soc-block soc-wide"><div class="soc-h">📥 Reçus (cours & fiches)</div>${recv}</div>
+      </div>
+      <div class="fiches-hint" style="margin-top:14px">Pour <b>envoyer un cours</b> : ouvre une matière → bouton <b>📤</b> dans l'en-tête. Pour <b>une fiche</b> : onglet Fiches → <b>📤</b> sur la fiche.</div>
+    </div>
+    <div id="socPanelGroupes" style="display:none">
+      <div id="grpTabContent"></div>
+    </div>`;
 }
+
+function switchSocTab(tab){
+  document.getElementById('socTabAmis').classList.toggle('active',tab==='amis');
+  document.getElementById('socTabGroupes').classList.toggle('active',tab==='groupes');
+  document.getElementById('socPanelAmis').style.display=tab==='amis'?'':'none';
+  document.getElementById('socPanelGroupes').style.display=tab==='groupes'?'':'none';
+  if(tab==='groupes'){loadGroups().then(renderGroupsTab);}
+}
+
+// ════════════════ GROUPES ════════════════
+let groupsList=[],activeGroupId=null,groupMsgs=[],grpPolling=null,grpPendingFile=null;
+let grpDocSaveTimer=null,grpCurrentInnerTab='msg',grpDocVersion=0;
+
+function switchGrpInner(tab){
+  grpCurrentInnerTab=tab;
+  ['msg','files','doc'].forEach(t=>{
+    const tabEl=document.getElementById('git'+t.charAt(0).toUpperCase()+t.slice(1));
+    const panEl=document.getElementById('gp'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(tabEl)tabEl.classList.toggle('active',t===tab);
+    if(panEl)panEl.classList.toggle('active',t===tab);
+  });
+  if(tab==='files')loadGroupFiles();
+  if(tab==='doc')loadSharedDoc();
+}
+
+async function loadGroups(){
+  if(!sb||!currentUser)return;
+  try{
+    const{data:memberships}=await sb.from('group_members').select('group_id').eq('user_id',currentUser.id);
+    if(!memberships||!memberships.length){groupsList=[];return;}
+    const gids=memberships.map(m=>m.group_id);
+    const{data:groups}=await sb.from('groups').select('*').in('id',gids).order('created_at',{ascending:false});
+    const{data:allMembers}=await sb.from('group_members').select('group_id,user_id').in('group_id',gids);
+    const memberCount={};(allMembers||[]).forEach(m=>{memberCount[m.group_id]=(memberCount[m.group_id]||0)+1;});
+    groupsList=(groups||[]).map(g=>({...g,member_count:memberCount[g.id]||0}));
+  }catch(e){console.warn('loadGroups:',e);}
+}
+
+async function createGroup(){
+  const name=(document.getElementById('grpName').value||'').trim();
+  if(!name){grpMsg('Donne un nom au groupe.',true);return;}
+  grpMsg('Création...');
+  try{
+    const{data:g,error}=await sb.from('groups').insert({name,creator:currentUser.id,created_at:new Date().toISOString()}).select().single();
+    if(error){grpMsg('Erreur : '+error.message,true);return;}
+    await sb.from('group_members').insert({group_id:g.id,user_id:currentUser.id,joined_at:new Date().toISOString()});
+    const checks=document.querySelectorAll('.grp-invite-check:checked');
+    for(const ch of checks) await sb.from('group_members').insert({group_id:g.id,user_id:ch.dataset.uid,joined_at:new Date().toISOString()}).catch(()=>{});
+    document.getElementById('grpName').value='';
+    grpMsg('Groupe \u00ab\u00a0'+name+'\u00a0\u00bb cr\u00e9\u00e9\u00a0! \u2705');
+    await loadGroups();renderGroupsTab();
+  }catch(e){grpMsg('Erreur cr\u00e9ation.',true);}
+}
+
+async function openGroup(gid){
+  activeGroupId=gid;grpCurrentInnerTab='msg';grpDocVersion=0;
+  const g=groupsList.find(x=>x.id===gid)||{name:'Groupe'};
+  document.getElementById('grpListView').style.display='none';
+  document.getElementById('grpChatPanel').style.display='flex';
+  document.getElementById('grpPanelName').textContent=g.name;
+  const{data:mems}=await sb.from('group_members').select('user_id').eq('group_id',gid);
+  const memberIds=(mems||[]).map(m=>m.user_id);
+  if(memberIds.length){
+    const{data:profs}=await sb.from('profiles').select('id,email,username').in('id',memberIds);
+    document.getElementById('grpPanelMembers').textContent=(profs||[]).map(p=>p.username||p.email.split('@')[0]).join(', ');
+  }
+  switchGrpInner('msg');
+  await loadGroupMsgs();
+  if(grpPolling)clearInterval(grpPolling);
+  grpPolling=setInterval(()=>{
+    if(grpCurrentInnerTab==='msg')loadGroupMsgs();
+    else if(grpCurrentInnerTab==='doc')pollSharedDoc();
+  },4000);
+}
+
+function closeGroup(){
+  activeGroupId=null;
+  if(grpPolling){clearInterval(grpPolling);grpPolling=null;}
+  if(grpDocSaveTimer){clearTimeout(grpDocSaveTimer);grpDocSaveTimer=null;}
+  document.getElementById('grpListView').style.display='';
+  document.getElementById('grpChatPanel').style.display='none';
+  grpPendingFile=null;updateGrpPdfIndicator();
+}
+
+// ── MESSAGES ──
+async function loadGroupMsgs(){
+  if(!activeGroupId)return;
+  try{
+    const{data:msgs}=await sb.from('group_messages').select('*').eq('group_id',activeGroupId).order('created_at',{ascending:true}).limit(200);
+    groupMsgs=msgs||[];renderGroupMsgs();
+  }catch(e){console.warn('loadGroupMsgs:',e);}
+}
+
+function renderGroupMsgs(){
+  const box=document.getElementById('grpMsgsBox');if(!box)return;
+  const wasAtBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+  if(!groupMsgs.length){box.innerHTML='<div class="empty-mini" style="text-align:center;margin-top:30px">Commencez la conversation \ud83d\udc4b</div>';return;}
+  box.innerHTML=groupMsgs.map(m=>{
+    const mine=m.sender_id===currentUser.id;
+    const cls=mine?'mine':'theirs';
+    const name=mine?'Toi':esc(m.sender_name||'?');
+    const time=new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const bubble=m.file_name
+      ?`<a class="grp-msg-file" href="${esc(m.file_url||'')}" download="${esc(m.file_name)}" target="_blank">\ud83d\udcce ${esc(m.file_name)}</a>`
+      :`<div class="grp-msg-bubble">${esc(m.content||'')}</div>`;
+    return `<div class="grp-msg ${cls}">${bubble}<span class="grp-msg-meta">${mine?'':name+' \u00b7 '}${time}</span></div>`;
+  }).join('');
+  if(wasAtBottom)box.scrollTop=box.scrollHeight;
+}
+
+async function sendGroupMsg(){
+  if(!activeGroupId)return;
+  if(grpPendingFile){await sendGroupFile();return;}
+  const inp=document.getElementById('grpMsgInput');
+  const content=(inp?inp.value:'').trim();if(!content)return;
+  inp.value='';
+  try{
+    await sb.from('group_messages').insert({group_id:activeGroupId,sender_id:currentUser.id,sender_name:myName(),content,created_at:new Date().toISOString()});
+    await loadGroupMsgs();
+  }catch(e){flash('Erreur envoi message');}
+}
+
+function grpKeydown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendGroupMsg();}}
+
+function grpAttachFile(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*,.txt,.md';
+  inp.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>5*1024*1024){flash('Fichier trop grand (max 5\u00a0Mo)');return;}
+    grpPendingFile=file;updateGrpPdfIndicator();
+  };inp.click();
+}
+
+function updateGrpPdfIndicator(){
+  const el=document.getElementById('grpPdfIndicator');if(!el)return;
+  if(grpPendingFile){el.textContent='\ud83d\udcce '+grpPendingFile.name+' (cliquer pour annuler)';el.style.display='';}
+  else{el.style.display='none';}
+}
+
+function cancelGrpFile(){grpPendingFile=null;updateGrpPdfIndicator();}
+
+async function sendGroupFile(){
+  if(!grpPendingFile||!activeGroupId)return;
+  const file=grpPendingFile;
+  try{
+    const b64=await toB64(file);
+    await sb.from('group_messages').insert({group_id:activeGroupId,sender_id:currentUser.id,sender_name:myName(),content:'',file_name:file.name,file_url:b64,created_at:new Date().toISOString()});
+    grpPendingFile=null;updateGrpPdfIndicator();await loadGroupMsgs();
+  }catch(e){flash('Erreur envoi fichier');}
+}
+
+// ── FICHIERS ──
+async function grpUploadFile(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*,.txt,.md,.docx';
+  inp.onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>5*1024*1024){flash('Fichier trop grand (max 5\u00a0Mo)');return;}
+    flash('Envoi de \u00ab\u00a0'+file.name+'\u00a0\u00bb\u2026');
+    try{
+      const b64=await toB64(file);
+      await sb.from('group_files').insert({group_id:activeGroupId,sender_id:currentUser.id,sender_name:myName(),file_name:file.name,file_url:b64,created_at:new Date().toISOString()});
+      flash('\u2705 Fichier partag\u00e9\u00a0!');loadGroupFiles();
+    }catch(err){flash('Erreur\u00a0: '+err.message);}
+  };inp.click();
+}
+
+async function loadGroupFiles(){
+  const grid=document.getElementById('grpFilesGrid');if(!grid)return;
+  grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;text-align:center">Chargement\u2026</div>';
+  try{
+    const{data:files}=await sb.from('group_files').select('*').eq('group_id',activeGroupId).order('created_at',{ascending:false});
+    if(!files||!files.length){grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;text-align:center;margin-top:30px">Aucun fichier partag\u00e9 dans ce groupe.</div>';return;}
+    grid.innerHTML=files.map(f=>{
+      const ext=(f.file_name||'').split('.').pop().toLowerCase();
+      const icon=ext==='pdf'?'\ud83d\udcc4':['jpg','jpeg','png','gif','webp'].includes(ext)?'\ud83d\uddbc\ufe0f':ext==='txt'||ext==='md'?'\ud83d\udcc3':'\ud83d\udcce';
+      const date=new Date(f.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+      return `<a class="grp-file-card" href="${esc(f.file_url)}" download="${esc(f.file_name)}" target="_blank">
+        <div class="grp-file-icon">${icon}</div>
+        <div class="grp-file-name">${esc(f.file_name)}</div>
+        <div class="grp-file-meta">Par ${esc(f.sender_name||'?')} \u00b7 ${date}</div>
+      </a>`;
+    }).join('');
+  }catch(e){grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1">Erreur chargement fichiers.</div>';}
+}
+
+// ── DOCUMENT PARTAG\u00c9 ──
+async function loadSharedDoc(){
+  const editor=document.getElementById('grpDocEditor');
+  const status=document.getElementById('grpDocStatus');
+  if(!editor||!activeGroupId)return;
+  status.textContent='Chargement\u2026';status.className='grp-doc-status';
+  try{
+    const{data}=await sb.from('group_docs').select('*').eq('group_id',activeGroupId).maybeSingle();
+    if(data){
+      grpDocVersion=data.version||0;
+      editor.innerHTML=data.content||'';
+      const lastEd=document.getElementById('grpDocLastEditor');
+      if(lastEd)lastEd.textContent=data.last_editor_name?'Derni\u00e8re modif par '+data.last_editor_name:'';
+      status.textContent='\u2713 Document synchronis\u00e9';status.className='grp-doc-status saved';
+    }else{
+      editor.innerHTML='';grpDocVersion=0;
+      status.textContent='Document vide \u2014 commence \u00e0 \u00e9crire\u00a0!';status.className='grp-doc-status';
+    }
+  }catch(e){status.textContent='Erreur de chargement.';status.className='grp-doc-status';}
+}
+
+async function pollSharedDoc(){
+  if(!activeGroupId)return;
+  try{
+    const{data}=await sb.from('group_docs').select('version,content,last_editor_name,last_editor_id').eq('group_id',activeGroupId).maybeSingle();
+    if(data&&data.version>grpDocVersion&&data.last_editor_id!==currentUser.id){
+      grpDocVersion=data.version;
+      const editor=document.getElementById('grpDocEditor');
+      if(editor)editor.innerHTML=data.content||'';
+      const lastEd=document.getElementById('grpDocLastEditor');
+      if(lastEd)lastEd.textContent=data.last_editor_name?'Modifi\u00e9 par '+data.last_editor_name:'';
+      const status=document.getElementById('grpDocStatus');
+      if(status){status.textContent='\u270f\ufe0f Mis \u00e0 jour par '+esc(data.last_editor_name||'quelqu\'un');status.className='grp-doc-status saved';}
+    }
+  }catch(e){}
+}
+
+function onDocInput(){
+  const status=document.getElementById('grpDocStatus');
+  if(status){status.textContent='Modifications en cours\u2026';status.className='grp-doc-status saving';}
+  if(grpDocSaveTimer)clearTimeout(grpDocSaveTimer);
+  grpDocSaveTimer=setTimeout(saveSharedDoc,1500);
+}
+
+async function saveSharedDoc(){
+  if(!activeGroupId)return;
+  const editor=document.getElementById('grpDocEditor');
+  const status=document.getElementById('grpDocStatus');
+  if(!editor)return;
+  const newVersion=grpDocVersion+1;
+  try{
+    const{error}=await sb.from('group_docs').upsert({
+      group_id:activeGroupId,content:editor.innerHTML,version:newVersion,
+      last_editor_id:currentUser.id,last_editor_name:myName(),
+      updated_at:new Date().toISOString()
+    },{onConflict:'group_id'});
+    if(!error){
+      grpDocVersion=newVersion;
+      if(status){status.textContent='\u2713 Sauvegard\u00e9 automatiquement';status.className='grp-doc-status saved';}
+      const lastEd=document.getElementById('grpDocLastEditor');
+      if(lastEd)lastEd.textContent='Toi';
+    }
+  }catch(e){if(status)status.textContent='Erreur sauvegarde';}
+}
+
+function docExec(cmd,val){
+  document.getElementById('grpDocEditor')?.focus();
+  document.execCommand(cmd,false,val||null);
+}
+
+function downloadSharedDoc(){
+  const editor=document.getElementById('grpDocEditor');if(!editor)return;
+  const g=groupsList.find(x=>x.id===activeGroupId)||{name:'document'};
+  const blob=new Blob([editor.innerHTML],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=g.name.replace(/\s+/g,'_')+'_doc_partage.html';a.click();
+}
+
+function toB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
+
+function grpMsg(t,err){const m=document.getElementById('grpMsg');if(m){m.textContent=t||'';m.className='auth-msg '+(err?'err':'ok');}}
+
+async function leaveGroup(gid){
+  if(!confirm('Quitter ce groupe ?'))return;
+  await sb.from('group_members').delete().eq('group_id',gid).eq('user_id',currentUser.id);
+  closeGroup();await loadGroups();renderGroupsTab();
+}
+
+function renderGroupsTab(){
+  const el=document.getElementById('grpTabContent');if(!el)return;
+  const friendCheckboxes=friendsList.length?friendsList.map(fr=>{
+    const name=fr.profile.username?('@'+fr.profile.username):fr.profile.email;
+    return `<div class="grp-invite-row"><span class="grp-invite-name">${esc(name)}</span><input type="checkbox" class="grp-invite-check" data-uid="${fr.id}"></div>`;
+  }).join(''):'<div class="empty-mini">Ajoute des amis d\'abord pour pouvoir les inviter.</div>';
+  const groupCards=groupsList.length?groupsList.map(g=>`
+    <div class="grp-card">
+      <div class="grp-card-top">
+        <div class="grp-icon">\ud83d\udcac</div>
+        <div class="grp-info">
+          <div class="grp-name">${esc(g.name)}</div>
+          <div class="grp-meta">\ud83d\udc65 ${g.member_count} membre${g.member_count>1?'s':''}</div>
+        </div>
+        <button class="grp-open-btn" onclick="openGroup('${g.id}')">Ouvrir \u2192</button>
+      </div>
+    </div>`).join(''):'<div class="empty-mini">Tu n\'es dans aucun groupe. Cr\u00e9e-en un ci-dessous\u00a0!</div>';
+  el.innerHTML=`
+    <div id="grpListView">
+      <div class="grp-section-title">Mes groupes</div>
+      <div class="grp-list" style="margin-bottom:16px">${groupCards}</div>
+      <div class="grp-create-form">
+        <div class="grp-section-title">\u2795 Cr\u00e9er un groupe</div>
+        <div class="add-inline" style="margin-bottom:10px">
+          <input class="grow" id="grpName" placeholder="Nom du groupe (ex\u00a0: L1 Droit S2)">
+          <button class="btn-sm" onclick="createGroup()">Cr\u00e9er</button>
+        </div>
+        <div class="auth-msg" id="grpMsg"></div>
+        <div class="grp-section-title" style="margin-top:12px">Inviter des amis dans le groupe</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">${friendCheckboxes}</div>
+      </div>
+    </div>
+    <div id="grpChatPanel" class="grp-chat-wrap" style="display:none;flex-direction:column;">
+      <div class="grp-panel-header">
+        <button class="grp-back" onclick="closeGroup()">\u2190</button>
+        <div style="flex:1">
+          <div class="grp-panel-name" id="grpPanelName">Groupe</div>
+          <div class="grp-panel-members" id="grpPanelMembers"></div>
+        </div>
+        <button class="btn-sm sec" onclick="leaveGroup(activeGroupId)">Quitter</button>
+      </div>
+      <div class="grp-inner-tabs">
+        <button class="grp-inner-tab active" id="gitMsg" onclick="switchGrpInner('msg')">\ud83d\udcac Messages</button>
+        <button class="grp-inner-tab" id="gitFiles" onclick="switchGrpInner('files')">\ud83d\udcce Fichiers</button>
+        <button class="grp-inner-tab" id="gitDoc" onclick="switchGrpInner('doc')">\ud83d\udcdd Doc partag\u00e9</button>
+      </div>
+      <div class="grp-panel active" id="gpMsg">
+        <div class="grp-msgs" id="grpMsgsBox"></div>
+        <div class="grp-pdf-preview" id="grpPdfIndicator" style="display:none;" onclick="cancelGrpFile()"></div>
+        <div class="grp-input-bar">
+          <button class="grp-attach-btn" onclick="grpAttachFile()" title="Joindre PDF ou image">\ud83d\udcce</button>
+          <input id="grpMsgInput" placeholder="Message au groupe\u2026" onkeydown="grpKeydown(event)">
+          <button class="grp-send-btn" onclick="sendGroupMsg()">\u27a4</button>
+        </div>
+      </div>
+      <div class="grp-panel" id="gpFiles">
+        <div class="grp-files-grid" id="grpFilesGrid"><div class="empty-mini" style="grid-column:1/-1;text-align:center;margin-top:30px">Aucun fichier partag\u00e9.</div></div>
+        <div class="grp-files-upload">
+          <button class="btn-sm" onclick="grpUploadFile()">\ud83d\udce4 Partager un fichier</button>
+          <span style="font-size:11px;color:var(--text-muted)">PDF, image, texte \u2014 max 5\u00a0Mo</span>
+        </div>
+      </div>
+      <div class="grp-panel" id="gpDoc">
+        <div class="grp-doc-toolbar">
+          <button class="grp-doc-btn" onclick="docExec('bold')" title="Gras"><b>B</b></button>
+          <button class="grp-doc-btn" onclick="docExec('italic')" title="Italique"><i>I</i></button>
+          <button class="grp-doc-btn" onclick="docExec('underline')" title="Soulign\u00e9"><u>U</u></button>
+          <div class="grp-doc-sep"></div>
+          <button class="grp-doc-btn" onclick="docExec('insertUnorderedList')">\u2022 Liste</button>
+          <button class="grp-doc-btn" onclick="docExec('insertOrderedList')">1. Liste</button>
+          <div class="grp-doc-sep"></div>
+          <button class="grp-doc-btn" onclick="docExec('formatBlock','h2')">H2</button>
+          <button class="grp-doc-btn" onclick="docExec('formatBlock','h3')">H3</button>
+          <button class="grp-doc-btn" onclick="docExec('formatBlock','p')">\u00b6</button>
+          <div class="grp-doc-sep"></div>
+          <button class="grp-doc-btn" onclick="downloadSharedDoc()">\u2b07 Export</button>
+        </div>
+        <div class="grp-doc-editor" id="grpDocEditor" contenteditable="true"
+             data-placeholder="Ce document est partag\u00e9 avec tout le groupe. \u00c9cris ici\u2026"
+             oninput="onDocInput()"></div>
+        <div class="grp-doc-footer">
+          <span class="grp-doc-status" id="grpDocStatus">Chargement\u2026</span>
+          <span style="font-size:10px;color:var(--text-muted)" id="grpDocLastEditor"></span>
+        </div>
+      </div>
+    </div>`
+
 async function checkAdmin(){
   isAdmin=false;
   try{
