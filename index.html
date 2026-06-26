@@ -2375,14 +2375,14 @@ async function createGroup(){
   grpMsg('Création...');
   try{
     const{data:g,error}=await sb.from('groups').insert({name,creator:currentUser.id,created_at:new Date().toISOString()}).select().single();
-    if(error){grpMsg('Erreur : '+error.message,true);return;}
+    if(error){grpMsg('Erreur : '+error.message+' ['+error.code+']',true);console.error('createGroup:',error);return;}
     await sb.from('group_members').insert({group_id:g.id,user_id:currentUser.id,joined_at:new Date().toISOString()});
     const checks=document.querySelectorAll('.grp-invite-check:checked');
     for(const ch of checks) await sb.from('group_members').insert({group_id:g.id,user_id:ch.dataset.uid,joined_at:new Date().toISOString()}).catch(()=>{});
     document.getElementById('grpName').value='';
     grpMsg('Groupe \u00ab\u00a0'+name+'\u00a0\u00bb cr\u00e9\u00e9\u00a0! \u2705');
     await loadGroups();renderGroupsTab();
-  }catch(e){grpMsg('Erreur cr\u00e9ation.',true);}
+  }catch(e){grpMsg('Erreur : '+e.message,true);console.error('createGroup catch:',e);}
 }
 
 async function openGroup(gid){
